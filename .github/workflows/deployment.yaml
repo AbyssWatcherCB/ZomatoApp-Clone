@@ -29,7 +29,7 @@ jobs:
 
       - name: Docker build and push
         run: |
-          echo  ${{ secrets.DOCKER_TOKEN }}$DOCKER_TOKEN | docker login -u ${{ secrets.DOCKER_USERNAME }} --password-stdin
+          echo  ${{ secrets.DOCKERHUB_TOKEN }}$DOCKERHUB_TOKEN | docker login -u ${{ secrets.DOCKERHUB_USERNAME }} -p ${{ secrets.DOCKERHUB_TOKEN }}
           docker build -t jackquick/zomato .
           docker tag jackquick/zomato:latest jackquick/zomato:latest
           docker push jackquick/zomato:latest
