@@ -8,7 +8,7 @@ on:
 jobs:
   build-analyze-scan:
     name: Build, Analyze, and Scan
-    runs-on: [self-hosted]
+    runs-on: self-hosted
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -33,17 +33,18 @@ jobs:
           DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
           DOCKER_TOKEN: ${{ secrets.DOCKER_TOKEN }}
         run: |
-          docker build -t zomato .
-          docker tag zomato jackquick/zomato:latest
+          docker build -t jackquick/zomato .
+          docker tag jackquick/zomato:latest jackquick/zomato:latest
           docker login -u $DOCKER_USERNAME -p $DOCKER_TOKEN
           docker push jackquick/zomato:latest
-      - name: trivy scan image 
+
+      - name: Trivy scan Docker image
         run: trivy image jackquick/zomato:latest
 
   deploy:
     name: Deploy app to Docker
     needs: build-analyze-scan
-    runs-on: [self-hosted]
+    runs-on: self-hosted
     steps:
       - name: Pull Docker image
         run: docker pull jackquick/zomato:latest
