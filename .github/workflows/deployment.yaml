@@ -25,7 +25,7 @@ jobs:
         run: npm install
 
       - name: Trivy vulnerability scan
-        run: trivy -fs . > trivy-report.txt
+        run: trivy fs . > trivy-report.txt
 
       - name: Docker build and push
         env:
