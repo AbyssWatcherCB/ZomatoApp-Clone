@@ -6,25 +6,26 @@ on:
       - main
 
 jobs:
- build-analyze-scan:
-    name: build
-    runs-on: [self-hosted]
+  build-analyze-scan:
+    name: Build, Analyze, and Scan
+    runs-on: self-hosted
     steps:
-      - name: checkout the code
+      - name: Checkout code
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      - name: BUilding code and analyze with SonarQube
-        uses: actions/checkout@master
+
+      - name: SonarQube analysis
+        uses: sonarsource/sonarcloud-github-action@master
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
-      - name: dependencies install
-        run: |
-          npm install
+
+      - name: Install dependencies
+        run: npm install
+
       - name: Trivy vulnerability scan
-        run: |
-          trivy -fs . > trivy-report.txt
+        run: trivy -fs . > trivy-report.txt
 
       - name: Docker build and push
         env:
@@ -37,7 +38,7 @@ jobs:
           docker push jackquick/zomato:latest
 
       - name: Trivy scan Docker image
-        run: trivy image jackquick/zomato:latest
+        run: trivy image jackquick/zomato:latest > image-trivy-scan.txt
 
   deploy:
     name: Deploy app to Docker
