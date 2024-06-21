@@ -8,7 +8,7 @@ on:
 jobs:
   build-analyze-scan:
     name: Build, Analyze, and Scan
-    runs-on: self-hosted
+    runs-on: [self-hosted]
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -21,9 +21,7 @@ jobs:
       - name: SonarQube analysis
         uses: sonarsource/sonarcloud-github-action@master
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-          SONAR_PROJECT_KEY: your_sonar_project_key
           SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
 
       - name: Trivy vulnerability scan
@@ -36,20 +34,22 @@ jobs:
           DOCKER_TOKEN: ${{ secrets.DOCKER_TOKEN }}
         run: |
           docker build -t zomato .
-          docker tag zomato manlineroot12/zomato:latest
+          docker tag zomato jackquick/zomato:latest
           docker login -u $DOCKER_USERNAME -p $DOCKER_TOKEN
-          docker push manlineroot12/zomato:latest
+          docker push jackquick/zomato:latest
+      - name: trivy scan image 
+        run: trivy image jackquick/zomato:latest
 
   deploy:
     name: Deploy app to Docker
     needs: build-analyze-scan
-    runs-on: self-hosted
+    runs-on: [self-hosted]
     steps:
       - name: Pull Docker image
-        run: docker pull manlineroot12/zomato:latest
+        run: docker pull jackquick/zomato:latest
 
       - name: Image scan with Trivy
-        run: trivy image manlineroot12/zomato:latest > image-trivy-scan.txt
+        run: trivy image jackquick/zomato:latest > image-trivy-scan.txt
 
       - name: Run Docker container
-        run: docker run -itd -p 3000:3000 --name zomato manlineroot12/zomato:latest
+        run: docker run -itd -p 3000:3000 --name zomato jackquick/zomato:latest
